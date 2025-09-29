@@ -97,3 +97,4 @@ trading_data/
 historical_data/
 .env
 .env.example
+node_modules
