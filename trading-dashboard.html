@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Market Trading Signals Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-connected { background: #4CAF50; }
+        .status-disconnected { background: #f44336; }
+        .status-warning { background: #FF9800; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .signals-panel, .market-overview {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .signal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .signal-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .signal-buy {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .signal-sell {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .signal-hold {
+            background: linear-gradient(135deg, #FF9800, #f57c00);
+            color: white;
+        }
+
+        .signal-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .signal-details {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .signal-action {
+            text-align: right;
+        }
+
+        .confidence-bar {
+            width: 60px;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .market-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timestamp {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .market-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇮🇳 Indian Market Trading Signals</h1>
+            <p>Real-time NSE equity signals powered by AI analysis</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div id="connectionStatus" class="status-indicator status-disconnected"></div>
+                <span>Server Connection</span>
+            </div>
+            <div class="status-item">
+                <div id="authStatus" class="status-indicator status-disconnected"></div>
+                <span>Kite Authentication</span>
+            </div>
+            <div class="status-item">
+                <div id="streamStatus" class="status-indicator status-disconnected"></div>
+                <span>Live Data Stream</span>
+            </div>
+            <div class="status-item">
+                <span id="marketPhase">Market: Closed</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="refreshSignals()">🔄 Refresh Signals</button>
+            <button class="btn" onclick="refreshSingleSignal()">📈 Single Signal</button>
+            <button class="btn" onclick="checkStatus()">🔍 Check Status</button>
+            <button class="btn" onclick="toggleAutoRefresh()">⚡ Auto Refresh</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="signals-panel">
+                <h2 class="panel-title">🎯 Active Trading Signals</h2>
+                <div id="signalsContainer" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading trading signals...</p>
+                </div>
+            </div>
+
+            <div class="market-overview">
+                <h2 class="panel-title">📊 Market Overview</h2>
+                <div class="market-stats">
+                    <div class="stat-box">
+                        <span id="totalSignals" class="stat-number">-</span>
+                        <div class="stat-label">Total Signals</div>
+                    </div>
+                    <div class="stat-box">
+                        <span id="buySignals" class="stat-number">-</span>
+                        <div class="stat-label">Buy Signals</div>
+                    </div>
+                    <div class="stat-box">
+                        <span id="sellSignals" class="stat-number">-</span>
+                        <div class="stat-label">Sell Signals</div>
+                    </div>
+                    <div class="stat-box">
+                        <span id="highConfidence" class="stat-number">-</span>
+                        <div class="stat-label">High Confidence</div>
+                    </div>
+                </div>
+                
+                <div id="marketInfo">
+                    <p><strong>Market Phase:</strong> <span id="currentPhase">Loading...</span></p>
+                    <p><strong>Last Update:</strong> <span id="lastUpdate">Never</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            <p>Dashboard auto-refreshes every 30 seconds during market hours</p>
+            <p id="nextUpdate"></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let autoRefreshEnabled = false;
+        let refreshTimer = null;
+
+        // Initialize dashboard
+        async function init() {
+            await checkStatus();
+            await refreshSignals();
+            
+            // Start auto-refresh if market is open
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            }
+        }
+
+        // Check server and authentication status
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                const data = await response.json();
+                
+                // Update connection status
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.className = `status-indicator ${response.ok ? 'status-connected' : 'status-disconnected'}`;
+                
+                // Update auth status
+                const authStatus = document.getElementById('authStatus');
+                authStatus.className = `status-indicator ${data.authenticated ? 'status-connected' : 'status-disconnected'}`;
+                
+                // Update stream status
+                const streamStatus = document.getElementById('streamStatus');
+                streamStatus.className = `status-indicator ${data.streaming ? 'status-connected' : 'status-warning'}`;
+                
+                // Update market phase
+                document.getElementById('marketPhase').textContent = `Market: ${data.marketPhase || 'Unknown'}`;
+                document.getElementById('currentPhase').textContent = data.marketPhase || 'Unknown';
+                
+                return data;
+            } catch (error) {
+                console.error('Status check failed:', error);
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.className = 'status-indicator status-disconnected';
+            }
+        }
+
+        // Refresh all signals
+        async function refreshSignals() {
+            const container = document.getElementById('signalsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading signals...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/signals/watchlist`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySignals(data.data);
+                    updateStats(data.data);
+                } else {
+                    container.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                }
+                
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+                
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Failed to load signals: ${error.message}</div>`;
+            }
+        }
+
+        // Get single signal for demo
+        async function refreshSingleSignal() {
+            const container = document.getElementById('signalsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating signal for RELIANCE...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/signals/generate/RELIANCE`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const mockWatchlistData = {
+                        signals: [data.data],
+                        totalAnalyzed: 1,
+                        highConfidenceSignals: data.data.signal.confidence > 0.7 ? 1 : 0,
+                        buySignals: data.data.signal.action === 'BUY' ? 1 : 0,
+                        sellSignals: data.data.signal.action === 'SELL' ? 1 : 0
+                    };
+                    
+                    displaySignals(mockWatchlistData);
+                    updateStats(mockWatchlistData);
+                } else {
+                    container.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                }
+                
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+                
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Failed to generate signal: ${error.message}</div>`;
+            }
+        }
+
+        // Display signals in UI
+        function displaySignals(data) {
+            const container = document.getElementById('signalsContainer');
+            
+            if (!data.signals || data.signals.length === 0) {
+                container.innerHTML = '<p>No signals available. Ensure you are authenticated and market is open.</p>';
+                return;
+            }
+            
+            const signalsHTML = data.signals.map(item => {
+                const signal = item.signal;
+                const actionClass = signal.action.toLowerCase();
+                const confidencePercent = (signal.confidence * 100).toFixed(1);
+                
+                return `
+                    <div class="signal-item signal-${actionClass}">
+                        <div class="signal-info">
+                            <h3>${signal.symbol}</h3>
+                            <div class="signal-details">
+                                Entry: ₹${signal.entryPrice?.toFixed(2) || 'N/A'} | 
+                                Target: ₹${signal.target?.toFixed(2) || 'N/A'} | 
+                                SL: ₹${signal.stopLoss?.toFixed(2) || 'N/A'}
+                            </div>
+                            <div class="signal-details" style="margin-top: 5px; font-size: 0.8rem;">
+                                ${signal.reasoning || 'No reasoning provided'}
+                            </div>
+                        </div>
+                        <div class="signal-action">
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">
+                                ${signal.action}
+                            </div>
+                            <div style="font-size: 0.9rem;">${confidencePercent}%</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = signalsHTML;
+        }
+
+        // Update stats display
+        function updateStats(data) {
+            document.getElementById('totalSignals').textContent = data.totalAnalyzed || 0;
+            document.getElementById('buySignals').textContent = data.buySignals || 0;
+            document.getElementById('sellSignals').textContent = data.sellSignals || 0;
+            document.getElementById('highConfidence').textContent = data.highConfidenceSignals || 0;
+        }
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+            
+            const btn = event.target;
+            btn.textContent = autoRefreshEnabled ? '⏸️ Stop Auto' : '⚡ Auto Refresh';
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh() {
+            stopAutoRefresh(); // Clear existing timer
+            refreshTimer = setInterval(async () => {
+                await refreshSignals();
+                updateNextRefreshTime();
+            }, 30000); // 30 seconds
+            
+            updateNextRefreshTime();
+        }
+
+        // Stop auto-refresh
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+            document.getElementById('nextUpdate').textContent = '';
+        }
+
+        // Update next refresh time display
+        function updateNextRefreshTime() {
+            if (autoRefreshEnabled) {
+                const nextTime = new Date(Date.now() + 30000);
+                document.getElementById('nextUpdate').textContent = `Next update: ${nextTime.toLocaleTimeString()}`;
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
