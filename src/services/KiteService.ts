@@ -291,13 +291,17 @@ export class KiteService extends EventEmitter {
   }
 
   /**
-   * Get historical data for a symbol
+   * Get historical data for a symbol with enhanced parameters
    */
   async getHistoricalData(
     symbol: string, 
     interval: string = 'minute',
     fromDate: Date,
-    toDate: Date
+    toDate: Date,
+    options: {
+      continuous?: boolean;
+      oi?: boolean;
+    } = {}
   ): Promise<KiteHistoricalData[]> {
     const instrumentToken = this.instrumentTokens.get(symbol);
     if (!instrumentToken) {
@@ -305,11 +309,17 @@ export class KiteService extends EventEmitter {
     }
 
     try {
+      // Build parameters object for Kite API
+      const params: any = {};
+      if (options.continuous) params.continuous = 1;
+      if (options.oi) params.oi = 1;
+
       const historicalData = await this.kiteConnect.getHistoricalData(
         instrumentToken,
         interval,
         fromDate,
-        toDate
+        toDate,
+        params
       );
 
       return historicalData.map((candle: any) => ({
@@ -325,6 +335,160 @@ export class KiteService extends EventEmitter {
     } catch (error) {
       logger.error('Failed to fetch historical data', error as Error);
       throw new AppError(`Failed to fetch historical data for ${symbol}`);
+    }
+  }
+
+  /**
+   * Get precise opening range data for a specific date
+   * Uses minute-level data for exact 9:15-9:30 AM range
+   */
+  async getOpeningRangeData(symbol: string, date: Date): Promise<{
+    openingRange: { high: number; low: number; open: number; volume: number };
+    minuteCandles: KiteHistoricalData[];
+    dataQuality: 'EXACT' | 'APPROXIMATE';
+  }> {
+    try {
+      // Set precise timestamps for 9:15-9:30 AM
+      const fromTime = new Date(date);
+      fromTime.setHours(9, 15, 0, 0);
+      
+      const toTime = new Date(date);
+      toTime.setHours(9, 30, 0, 0);
+
+      // Fetch minute-by-minute data for opening range
+      const minuteCandles = await this.getHistoricalData(
+        symbol,
+        'minute',
+        fromTime,
+        toTime
+      );
+
+      if (minuteCandles.length === 0) {
+        throw new AppError(`No opening range data available for ${symbol} on ${date.toDateString()}`);
+      }
+
+      // Calculate precise opening range
+      const openingRange = {
+        open: minuteCandles[0].open,
+        high: Math.max(...minuteCandles.map(c => c.high)),
+        low: Math.min(...minuteCandles.map(c => c.low)),
+        volume: minuteCandles.reduce((sum, c) => sum + c.volume, 0)
+      };
+
+      logger.info('Fetched precise opening range', {
+        symbol,
+        date: date.toDateString(),
+        range: openingRange,
+        candles: minuteCandles.length
+      });
+
+      return {
+        openingRange,
+        minuteCandles,
+        dataQuality: 'EXACT'
+      };
+
+    } catch (error) {
+      logger.error('Failed to fetch opening range data', error as Error);
+      
+      // Fallback to daily OHLC if minute data unavailable
+      try {
+        const dailyData = await this.getHistoricalData(symbol, 'day', date, date);
+        if (dailyData.length > 0) {
+          return {
+            openingRange: {
+              open: dailyData[0].open,
+              high: dailyData[0].high,
+              low: dailyData[0].low,
+              volume: dailyData[0].volume
+            },
+            minuteCandles: [],
+            dataQuality: 'APPROXIMATE'
+          };
+        }
+      } catch (fallbackError) {
+        logger.error('Fallback to daily data also failed', fallbackError as Error);
+      }
+
+      throw new AppError(`Failed to fetch opening range data for ${symbol}`);
+    }
+  }
+
+  /**
+   * Get volume profile for specific time periods
+   * Useful for identifying volume spikes and patterns
+   */
+  async getVolumeProfile(
+    symbol: string, 
+    date: Date, 
+    intervalMinutes: number = 5
+  ): Promise<{
+    timeSlots: Array<{
+      time: string;
+      volume: number;
+      avgPrice: number;
+      priceRange: { high: number; low: number };
+    }>;
+    totalVolume: number;
+    avgVolumePerSlot: number;
+  }> {
+    try {
+      // Get full trading day minute data
+      const fromTime = new Date(date);
+      fromTime.setHours(9, 15, 0, 0);
+      
+      const toTime = new Date(date);
+      toTime.setHours(15, 30, 0, 0);
+
+      const minuteCandles = await this.getHistoricalData(
+        symbol,
+        'minute',
+        fromTime,
+        toTime
+      );
+
+      // Group by time intervals
+      const timeSlots: any[] = [];
+      const slotsPerInterval = intervalMinutes;
+      
+      for (let i = 0; i < minuteCandles.length; i += slotsPerInterval) {
+        const slotCandles = minuteCandles.slice(i, i + slotsPerInterval);
+        if (slotCandles.length === 0) continue;
+
+        const slotVolume = slotCandles.reduce((sum, c) => sum + c.volume, 0);
+        const slotAvgPrice = slotCandles.reduce((sum, c) => sum + ((c.high + c.low) / 2), 0) / slotCandles.length;
+        
+        timeSlots.push({
+          time: slotCandles[0].date,
+          volume: slotVolume,
+          avgPrice: slotAvgPrice,
+          priceRange: {
+            high: Math.max(...slotCandles.map(c => c.high)),
+            low: Math.min(...slotCandles.map(c => c.low))
+          }
+        });
+      }
+
+      const totalVolume = timeSlots.reduce((sum, slot) => sum + slot.volume, 0);
+      const avgVolumePerSlot = totalVolume / timeSlots.length;
+
+      logger.info('Generated volume profile', {
+        symbol,
+        date: date.toDateString(),
+        intervals: timeSlots.length,
+        totalVolume,
+        avgVolumePerSlot
+      });
+
+      return {
+        timeSlots,
+        totalVolume,
+        avgVolumePerSlot
+      };
+
+    } catch (error) {
+      logger.error('Failed to generate volume profile', error as Error);
+      throw new AppError(`Failed to generate volume profile for ${symbol}`);
     }
   }
 
