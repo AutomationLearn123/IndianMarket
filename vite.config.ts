@@ -1,13 +1,17 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  root: './src/client',
+  root: './',
   build: {
-    outDir: '../../dist/client',
+    outDir: 'dist/client',
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        dashboard: 'trading-dashboard.html',
+        manual: 'manual-analysis.html'
+      }
+    }
   },
   server: {
     port: 5173,

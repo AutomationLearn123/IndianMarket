@@ -4,13 +4,43 @@
   "description": "Manual TradingView chart analysis using OpenAI Vision API for Indian NSE stocks",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "nodemon --exec ts-node src/server.ts",
-    "dev:client": "vite",
-    "build": "npm run build:server && npm run build:client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run serve:static\"",
+    "dev:server": "nodemon --exec ts-node trading-server.ts",
+    "dev:unified": "nodemon --exec ts-node unified-trading-server.ts",
+    "serve:static": "http-server . -p 5173 -c-1",
+    "build": "npm run build:server",
     "build:server": "tsc",
-    "build:client": "vite build",
     "start": "node dist/server.js",
+    
+    "login:url": "node get-login-url.js",
+    "login:token": "node get-access-token.js",
+    "login:auto": "node auto-login.js",
+    
+    "analyze:single": "node data-driven-llm-predictor.js",
+    "analyze:compare": "node system-comparison.js",
+    "analyze:patterns": "node pattern-recognition-engine.js",
+    "analyze:decision": "node trading-decision-framework.js",
+    "analyze:monitor": "node real-time-data-analyzer.js",
+    "analyze:realtime": "node realtime-llm-trading-system.js",
+    "analyze:dual": "node dual-system-comparison.js",
+    
+    "analyze:real": "node analyze-real.js",
+    "analyze:llm": "node analyze-full-llm.js",
+    "analyze:enhanced": "node analyze-enhanced-profile-cpr.js",
+    
+    "trading:quick": "npm run login:token && npm run analyze:compare",
+    "trading:full": "npm run login:token && npm run analyze:monitor",
+    "trading:single": "npm run login:token && npm run analyze:single",
+    "trading:realtime": "npm run login:token && npm run analyze:realtime",
+    "trading:dual": "npm run login:token && npm run analyze:dual",
+    
+    "data:status": "node data-manager.js status",
+    "data:signals": "node data-manager.js signals",
+    "data:stocks": "node data-manager.js stocks",
+    "data:backup": "node data-manager.js backup",
+    "data:clean": "node data-manager.js clean",
+    "data:info": "node data-manager.js info",
+    
     "test": "jest",
     "lint": "eslint src/**/*.{ts,tsx}",
     "type-check": "tsc --noEmit"

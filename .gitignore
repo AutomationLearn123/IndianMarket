@@ -95,6 +95,7 @@ request_token.txt
 # Trading data
 trading_data/
 historical_data/
+data/
 .env
 .env.example
 node_modules

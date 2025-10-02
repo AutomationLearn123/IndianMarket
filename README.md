@@ -1,89 +1,174 @@
-# 🇮🇳 Indian Market Trading Signal System
+# Indian Market Trading Signal System# 🇮🇳 Indian Market Trading Signal System
 
-A comprehensive real-time trading signal generation system for NSE equity stocks using Kite Connect API and AI-powered analysis.
 
-## 🚀 Features
 
-- **Real-time Data Streaming**: Live NSE stock prices via Kite Connect WebSocket
-- **AI-Powered Signals**: OpenAI GPT-4 integration for intelligent trading recommendations
-- **Volume Footprint Analysis**: Automated detection of volume imbalances and breakouts
-- **Interactive Dashboard**: Real-time web interface for signal monitoring
+A TypeScript-based real-time trading signal generation system using Kite Connect API and LLM analysis for NSE stocks.A comprehensive real-time trading signal generation system for NSE equity stocks using Kite Connect API and AI-powered analysis.
+
+
+
+## 🚀 Quick Start## 🚀 Features
+
+
+
+### Core Analysis Systems- **Real-time Data Streaming**: Live NSE stock prices via Kite Connect WebSocket
+
+```bash- **AI-Powered Signals**: OpenAI GPT-4 integration for intelligent trading recommendations
+
+# Rule-based volume footprint analysis- **Volume Footprint Analysis**: Automated detection of volume imbalances and breakouts
+
+node analyze-real.js RELIANCE- **Interactive Dashboard**: Real-time web interface for signal monitoring
+
 - **Multiple Timeframes**: Support for 1min, 5min, 15min, and daily analysis
-- **Risk Management**: Built-in stop-loss and target calculations
-- **NSE Watchlist**: Pre-configured list of top Indian equity stocks
 
-## 📁 Project Structure
+# LLM-enhanced directional analysis  - **Risk Management**: Built-in stop-loss and target calculations
 
-```
+node analyze-full-llm.js RELIANCE- **NSE Watchlist**: Pre-configured list of top Indian equity stocks
+
+
+
+# Institutional-grade Market Profile + CPR analysis## 📁 Project Structure
+
+node analyze-enhanced-profile-cpr.js RELIANCE
+
+``````
+
 IndianMarketManual/
-├── minimal-server.js           # Main Express.js server with all endpoints
+
+## 📁 Project Structure├── minimal-server.js           # Main Express.js server with all endpoints
+
 ├── trading-dashboard.html      # Real-time dashboard interface  
-├── test-complete-flow.js       # Complete flow testing script
-├── test-kite-connection.ts     # Kite API connection tester
-├── LLMTradingAnalyzer.ts      # AI trading signal generator
-├── src/
-│   ├── server.ts              # TypeScript server implementation
-│   ├── services/
-│   │   └── KiteService.ts     # Enhanced Kite Connect service
-│   ├── types/
-│   │   └── index.ts           # TypeScript type definitions
-│   └── utils/
-│       ├── config.ts          # Configuration management
-│       ├── errors.ts          # Custom error classes
-│       └── logger.ts          # Winston logger setup
-└── logs/                      # Application logs
-```
 
-## 🛠️ Setup & Installation
+```├── test-complete-flow.js       # Complete flow testing script
 
-### Prerequisites
-- Node.js v16+ 
-- Kite Connect API credentials (API Key, Secret)
-- OpenAI API key (optional, for real LLM analysis)
+├── analyze-real.js                 # Core rule-based trading system├── test-kite-connection.ts     # Kite API connection tester
 
-### Installation
+├── analyze-full-llm.js            # LLM-enhanced analysis system  ├── LLMTradingAnalyzer.ts      # AI trading signal generator
 
-1. **Clone and Install Dependencies**
+├── analyze-enhanced-profile-cpr.js # Institutional Market Profile system├── src/
+
+├── trading-server.ts              # Main trading server│   ├── server.ts              # TypeScript server implementation
+
+├── unified-trading-server.ts      # Unified WebSocket server│   ├── services/
+
+├── manual-analysis.html           # Manual analysis interface│   │   └── KiteService.ts     # Enhanced Kite Connect service
+
+├── trading-dashboard.html         # Real-time dashboard│   ├── types/
+
+├── package.json                   # Dependencies and scripts│   │   └── index.ts           # TypeScript type definitions
+
+├── tsconfig.json                  # TypeScript configuration│   └── utils/
+
+├── vite.config.ts                 # Vite build configuration│       ├── config.ts          # Configuration management
+
+├── .env.example                   # Environment variables template│       ├── errors.ts          # Custom error classes
+
+├── src/                          # Source code modules│       └── logger.ts          # Winston logger setup
+
+│   ├── services/                 # Trading analysis services└── logs/                      # Application logs
+
+│   ├── types/                    # TypeScript type definitions```
+
+│   └── utils/                    # Utility functions
+
+├── config/                       # Configuration files## 🛠️ Setup & Installation
+
+├── docs/                         # Documentation
+
+│   ├── HOW_TO_RUN.md            # Detailed setup guide### Prerequisites
+
+│   ├── OPTIMAL_TRADING_SCHEDULE.md # Trading timing guide- Node.js v16+ 
+
+│   └── *.md                      # All project documentation- Kite Connect API credentials (API Key, Secret)
+
+├── logs/                         # Application logs- OpenAI API key (optional, for real LLM analysis)
+
+└── archive/                      # Archived/experimental files
+
+```### Installation
+
+
+
+## 🎯 Core Features1. **Clone and Install Dependencies**
+
    ```bash
-   git clone <your-repo>
-   cd IndianMarketManual
-   npm install
-   ```
 
-2. **Environment Configuration**
-   Create a `.env` file in the root directory:
+- **Real-time NSE data** via Kite Connect API   git clone <your-repo>
+
+- **Volume footprint analysis** with 400%+ spike detection   cd IndianMarketManual
+
+- **Opening range breakouts** after 9:15 AM IST   npm install
+
+- **LLM directional prediction** for enhanced signals   ```
+
+- **Market Profile analysis** with VAH/VAL/POC levels
+
+- **CPR analysis** for institutional confluence2. **Environment Configuration**
+
+- **Options trading integration** for ITM Call/Put strategies   Create a `.env` file in the root directory:
+
    ```env
-   KITE_API_KEY=your_kite_api_key
+
+## 📋 Documentation   KITE_API_KEY=your_kite_api_key
+
    KITE_API_SECRET=your_kite_secret
-   OPENAI_API_KEY=your_openai_key_optional
-   PORT=3001
-   ```
 
-3. **Start the Server**
+All documentation is organized in the `/docs` folder:   OPENAI_API_KEY=your_openai_key_optional
+
+- **[HOW_TO_RUN.md](docs/HOW_TO_RUN.md)** - Complete setup and execution guide   PORT=3001
+
+- **[OPTIMAL_TRADING_SCHEDULE.md](docs/OPTIMAL_TRADING_SCHEDULE.md)** - Best trading times and strategies   ```
+
+- **[NIFTY50_SYMBOLS.md](docs/NIFTY50_SYMBOLS.md)** - Supported stock symbols
+
+- **[ENHANCED_BREAKOUT_SYSTEM.md](docs/ENHANCED_BREAKOUT_SYSTEM.md)** - Advanced analysis features3. **Start the Server**
+
    ```bash
-   node minimal-server.js
+
+## 🔧 Prerequisites   node minimal-server.js
+
    ```
 
-4. **Access the Dashboard**
-   Open `trading-dashboard.html` in your browser
+1. Node.js and npm installed
+
+2. Kite Connect API credentials (KITE_API_KEY, KITE_ACCESS_TOKEN)4. **Access the Dashboard**
+
+3. OpenAI API key for LLM analysis (optional)   Open `trading-dashboard.html` in your browser
+
+4. Set up environment variables in `.env` file
 
 ## 🔧 API Endpoints
 
+## 💡 Usage Tips
+
 ### Authentication
-- `GET /` - Welcome page with login instructions
-- `GET /login` - Redirect to Kite Connect login
-- `POST /kite/callback` - Handle Kite Connect authentication callback
+
+- **Prime trading hours**: 9:45-10:30 AM IST for best signals- `GET /` - Welcome page with login instructions
+
+- **Start with**: `analyze-real.js` for proven rule-based analysis- `GET /login` - Redirect to Kite Connect login
+
+- **For options**: Use equity signals to select ITM Call/Put options- `POST /kite/callback` - Handle Kite Connect authentication callback
+
+- **Risk management**: 2-3% risk per trade with proper position sizing
 
 ### Market Data
-- `GET /api/status` - Server and authentication status
+
+## 📈 Performance- `GET /api/status` - Server and authentication status
+
 - `GET /api/data/current/:symbol` - Current market data for a symbol
-- `GET /api/data/historical/:symbol` - Historical OHLCV data
-- `GET /api/data/llm-format/:symbol` - LLM-ready formatted data with volume analysis
+
+- **Rule-based system**: Consistent volume footprint breakouts- `GET /api/data/historical/:symbol` - Historical OHLCV data
+
+- **LLM-enhanced**: Directional prediction with higher accuracy- `GET /api/data/llm-format/:symbol` - LLM-ready formatted data with volume analysis
+
+- **Institutional system**: Market Profile confluence for premium signals
 
 ### Trading Signals
-- `GET /api/signals/generate/:symbol` - Generate AI trading signal for specific stock
+
+---- `GET /api/signals/generate/:symbol` - Generate AI trading signal for specific stock
+
 - `GET /api/signals/watchlist` - Generate signals for entire watchlist
-- `GET /api/stream/status` - WebSocket streaming status
+
+See `/docs` folder for detailed documentation and trading guides.- `GET /api/stream/status` - WebSocket streaming status
 
 ## 🎯 Usage Guide
 

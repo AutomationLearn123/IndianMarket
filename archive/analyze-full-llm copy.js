@@ -244,7 +244,7 @@ async function analyzeFullLLM(stockData) {
     return `${time}: ${min.close.toFixed(2)} V${min.volume}`;
   }).join('\n');
 
-  const prompt = `You are an elite Indian stock market analyst and algorithmic trader with 20+ years of experience in tick-by-tick market microstructure analysis, institutional order flow reading, and directional price prediction.
+  const prompt = `You are an elite Indian stock market analyst with 20+ years of experience in opening range breakout strategies, volume footprint analysis, and every 5-minute candle pattern recognition.
 
 ANALYSIS TIMESTAMP: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
 STOCK: ${symbol}
@@ -261,72 +261,45 @@ ${candleData}
 RECENT 1-MINUTE ACTIVITY (Last 20 minutes):
 ${minuteContext}
 
-🎯 PRIMARY OBJECTIVE: DIRECTIONAL PREDICTION ANALYSIS
-Your main task is to predict the IMMEDIATE NEXT MOVE (next 5-10 minutes) based on deep ticker analysis:
+YOUR EXPERTISE AREAS:
+1. OPENING RANGE BREAKOUT: Identify true breakouts above ₹${ohlc.high} or below ₹${ohlc.low}
+2. VOLUME FOOTPRINT ANALYSIS: Detect 400%+ volume spikes and their significance
+3. STACKED IMBALANCES: Find 2-3 consecutive directional moves with volume confirmation
+4. PATTERN RECOGNITION: Cup & handle, flags, pennants, volume accumulation patterns
+5. MARKET MICROSTRUCTURE: Order flow analysis, support/resistance levels
+6. RISK ASSESSMENT: Entry/exit points, stop-loss recommendations
 
-FOR BUY SIGNALS: Will price move UP from current level ₹${currentPrice}?
-FOR SELL SIGNALS: Will price move DOWN from current level ₹${currentPrice}?
+CRITICAL ANALYSIS REQUIREMENTS:
+✅ Opening Range Breakout: Does ANY 5-minute candle show clean breakout?
+✅ Volume Confirmation: Is there 400%+ volume spike on breakout candle?
+✅ Stacked Imbalances: Are there 2-3 consecutive moves in same direction?
+✅ Pattern Strength: How clean and decisive is the pattern?
+✅ Historical Context: How does today compare to recent sessions?
+✅ Risk/Reward: What are realistic targets and stop-losses?
 
-🔬 ADVANCED ANALYSIS AREAS:
-1. VOLUME FOOTPRINT PREDICTION: Analyze volume distribution and predict continuation
-2. ORDER FLOW READING: Detect institutional vs retail activity patterns
-3. PRICE ACTION MOMENTUM: Assess velocity and acceleration of price movement
-4. MARKET MICROSTRUCTURE: Read between-the-lines market sentiment
-5. TICK-BY-TICK PATTERNS: Identify sub-5-minute momentum shifts
-6. INSTITUTIONAL BEHAVIOR: Detect smart money accumulation/distribution
-7. LIQUIDITY ANALYSIS: Assess depth of buying/selling pressure
-8. MOMENTUM PERSISTENCE: Predict if current move will continue or reverse
-
-🎯 PREDICTIVE ANALYSIS REQUIREMENTS:
-✅ IMMEDIATE DIRECTION: Based on current candle formation, which way will price move NEXT?
-✅ MOMENTUM STRENGTH: How strong is the directional momentum right now?
-✅ INSTITUTIONAL ACTIVITY: Are big players buying or selling at this level?
-✅ VOLUME VELOCITY: Is volume accelerating or decelerating?
-✅ PRICE VELOCITY: Is price movement accelerating or losing steam?
-✅ SUPPORT/RESISTANCE: How will nearby levels affect the next move?
-✅ TIME FACTOR: Considering current time, is this move likely to sustain?
-✅ CONTINUATION vs REVERSAL: Will the pattern continue or reverse?
-
-🎯 PREDICTION METHODOLOGY:
-- Analyze the LAST 3 candles for momentum direction
-- Study volume progression to predict next volume burst
-- Examine wick formations for buying/selling pressure
-- Assess body-to-wick ratios for conviction strength
-- Factor in opening range position for institutional bias
-- Consider time of day for typical institutional behavior
-- Evaluate recent 1-minute data for acceleration patterns
-
-CRITICAL PREDICTION RULES:
-- Only recommend BUY if you predict price will move UP in next 5-10 minutes
-- Only recommend SELL if you predict price will move DOWN in next 5-10 minutes
-- Consider current market momentum and institutional behavior
-- Factor in volume acceleration patterns
-- Assess probability of continuation vs reversal
+TRADING RULES:
+- Only recommend BUY/SELL if you see: Breakout + 400% Volume + Stacked Imbalances
+- Consider the overall trend from daily data
+- Factor in current market time and remaining session
+- Assess pattern quality (clean vs. choppy)
+- Provide specific entry, target, and stop-loss levels
 
 OUTPUT FORMAT:
 SIGNAL: [BUY/SELL/NO_GOOD]
 CONFIDENCE: [0-100]%
-PREDICTION: [UP/DOWN/SIDEWAYS] - Your directional prediction for next 5-10 minutes
-PREDICTION_CONFIDENCE: [0-100]% - How confident are you in the direction?
 ENTRY_PRICE: ₹[specific price]
-TARGET_PRICE: ₹[specific price based on predicted move]
+TARGET_PRICE: ₹[specific price]
 STOP_LOSS: ₹[specific price]
 RISK_REWARD: [ratio]
-MOMENTUM_STRENGTH: [STRONG/MODERATE/WEAK]
-VOLUME_ACCELERATION: [INCREASING/DECREASING/STABLE]
-INSTITUTIONAL_BIAS: [BUYING/SELLING/NEUTRAL]
-NEXT_MOVE_TIMEFRAME: [1-5 minutes/5-10 minutes/10+ minutes]
 BREAKOUT_DETECTED: [YES/NO - specific candle time]
 VOLUME_SPIKE: [YES/NO - how many times average]
 STACKED_IMBALANCES: [YES/NO - how many consecutive]
 PATTERN_TYPE: [specific pattern name]
 HISTORICAL_CONTEXT: [how today compares to recent days]
-PREDICTION_REASONING: [WHY you think price will move UP/DOWN - focus on directional logic]
-RISK_FACTORS: [what could invalidate this directional prediction]
+REASONING: [detailed technical analysis explaining your decision]
+RISK_FACTORS: [what could invalidate this signal]
 
-Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extremely selective and only recommend trades when you have high confidence in the directional prediction. Focus on microstructure analysis and momentum persistence.
-
-Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extremely selective and only recommend trades when you have high confidence in the directional prediction. Focus on microstructure analysis and momentum persistence from market open onwards.`;
+Remember: Be extremely selective. Only recommend trades with high probability of success. Consider the Indian market context and NSE trading patterns from market open onwards.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -334,7 +307,7 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
       messages: [
         {
           role: 'system',
-          content: 'You are an elite Indian stock market analyst specializing in NSE intraday momentum detection and scalping strategies. Your expertise is in identifying IMMEDIATE directional moves (next 5-10 minutes) based on Indian market microstructure patterns, institutional flow, and momentum persistence. You understand that Indian markets can move rapidly with limited traditional confirmation signals. Focus on momentum continuation, price action, and institutional activity patterns specific to NSE trading hours. Be more aggressive in signal detection when you see clear directional momentum, even with limited traditional confirmation.'
+          content: 'You are an elite Indian stock market analyst with deep expertise in opening range breakout strategies, volume footprint analysis, and NSE trading patterns. You have 20+ years of experience in the Indian markets and understand the nuances of post-9:45 AM trading behavior. Be extremely selective and only recommend high-probability trades.'
         },
         {
           role: 'user',
@@ -351,16 +324,10 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
     // Parse LLM response
     const signalMatch = llmResponse.match(/SIGNAL:\s*(BUY|SELL|NO_GOOD)/i);
     const confidenceMatch = llmResponse.match(/CONFIDENCE:\s*(\d+)/);
-    const predictionMatch = llmResponse.match(/PREDICTION:\s*(UP|DOWN|SIDEWAYS)/i);
-    const predictionConfidenceMatch = llmResponse.match(/PREDICTION_CONFIDENCE:\s*(\d+)/);
     const entryMatch = llmResponse.match(/ENTRY_PRICE:\s*₹?(\d+\.?\d*)/);
     const targetMatch = llmResponse.match(/TARGET_PRICE:\s*₹?(\d+\.?\d*)/);
     const stopLossMatch = llmResponse.match(/STOP_LOSS:\s*₹?(\d+\.?\d*)/);
-    const momentumMatch = llmResponse.match(/MOMENTUM_STRENGTH:\s*(STRONG|MODERATE|WEAK)/i);
-    const volumeAccelMatch = llmResponse.match(/VOLUME_ACCELERATION:\s*(INCREASING|DECREASING|STABLE)/i);
-    const institutionalMatch = llmResponse.match(/INSTITUTIONAL_BIAS:\s*(BUYING|SELLING|NEUTRAL)/i);
-    const timeframeMatch = llmResponse.match(/NEXT_MOVE_TIMEFRAME:\s*(.*?)(?=\n|$)/i);
-    const reasoningMatch = llmResponse.match(/PREDICTION_REASONING:\s*(.*?)(?=RISK_FACTORS:|$)/is);
+    const reasoningMatch = llmResponse.match(/REASONING:\s*(.*?)(?=RISK_FACTORS:|$)/is);
     const breakoutMatch = llmResponse.match(/BREAKOUT_DETECTED:\s*(YES|NO)/i);
     const volumeMatch = llmResponse.match(/VOLUME_SPIKE:\s*(YES|NO)/i);
     const imbalanceMatch = llmResponse.match(/STACKED_IMBALANCES:\s*(YES|NO)/i);
@@ -368,88 +335,14 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
     
     const signal = signalMatch ? signalMatch[1].toUpperCase() : 'NO_GOOD';
     const confidence = confidenceMatch ? parseInt(confidenceMatch[1]) : 50;
-    
-    // Enhanced fallback parsing for free-form responses
-    let enhancedSignal = signal;
-    let enhancedConfidence = confidence;
-    let enhancedPrediction = predictionMatch ? predictionMatch[1].toUpperCase() : 'SIDEWAYS';
-    
-    // If structured parsing failed, try to extract from reasoning
-    if (signal === 'NO_GOOD' && confidence <= 50) {
-      const reasoning = reasoningMatch ? reasoningMatch[1] : llmResponse;
-      
-      // Look for directional indicators in free-form text
-      const bearishIndicators = /bearish|down|sell|drop|fall|decline|expect.*price.*down/gi;
-      const bullishIndicators = /bullish|up|buy|rise|surge|expect.*price.*up/gi;
-      
-      const bearishCount = (reasoning.match(bearishIndicators) || []).length;
-      const bullishCount = (reasoning.match(bullishIndicators) || []).length;
-      
-      console.log(`🔍 Fallback Analysis: Bearish indicators: ${bearishCount}, Bullish indicators: ${bullishCount}`);
-      
-      if (bearishCount > bullishCount && bearishCount >= 2) {
-        enhancedSignal = 'SELL';
-        enhancedConfidence = Math.min(70 + (bearishCount * 5), 85);
-        enhancedPrediction = 'DOWN';
-        console.log(`📈 Enhanced parsing detected SELL signal from reasoning`);
-      } else if (bullishCount > bearishCount && bullishCount >= 2) {
-        enhancedSignal = 'BUY';
-        enhancedConfidence = Math.min(70 + (bullishCount * 5), 85);
-        enhancedPrediction = 'UP';
-        console.log(`📈 Enhanced parsing detected BUY signal from reasoning`);
-      }
-    }
-    
-    // CONFLUENCE VALIDATION - More flexible for Indian market dynamics
-    const hasBreakout = breakoutMatch ? breakoutMatch[1].toUpperCase() === 'YES' : false;
-    const hasVolumeSpike = volumeMatch ? volumeMatch[1].toUpperCase() === 'YES' : false;
-    const hasImbalances = imbalanceMatch ? imbalanceMatch[1].toUpperCase() === 'YES' : false;
-    
-    const confluenceFactors = [hasBreakout, hasVolumeSpike, hasImbalances].filter(Boolean).length;
-    
-    // More flexible confluence requirements for Indian market
-    if ((enhancedSignal === 'BUY' || enhancedSignal === 'SELL') && enhancedConfidence > 70) {
-      if (confluenceFactors === 0) {
-        // Check if LLM confidence is very high with strong reasoning
-        if (enhancedConfidence >= 85) {
-          console.log(`⚠️ High confidence override: ${enhancedSignal} ${enhancedConfidence}% maintained (Strong LLM conviction)`);
-          enhancedConfidence = Math.min(enhancedConfidence, 70); // Reduce but don't eliminate
-        } else {
-          console.log(`⚠️ Signal downgrade: ${enhancedSignal} ${enhancedConfidence}% → NO_GOOD (No confluence factors)`);
-          enhancedSignal = 'NO_GOOD';
-          enhancedConfidence = 30;
-          enhancedPrediction = 'SIDEWAYS';
-        }
-      } else if (confluenceFactors === 1) {
-        console.log(`✅ Single factor signal: ${enhancedSignal} ${enhancedConfidence}% maintained (1 confluence factor)`);
-        enhancedConfidence = Math.min(enhancedConfidence, 70); // Allow single factor signals
-      } else if (confluenceFactors === 2) {
-        console.log(`✅ Strong signal: ${enhancedSignal} ${enhancedConfidence}% (2 confluence factors)`);
-        enhancedConfidence = Math.min(enhancedConfidence, 80);
-      } else {
-        console.log(`🚀 Excellent signal: ${enhancedSignal} ${enhancedConfidence}% (3+ confluence factors)`);
-      }
-    }
-    const prediction = enhancedPrediction;
-    const predictionConfidence = predictionConfidenceMatch ? parseInt(predictionConfidenceMatch[1]) : enhancedConfidence;
     const entryPrice = entryMatch ? parseFloat(entryMatch[1]) : currentPrice;
     const targetPrice = targetMatch ? parseFloat(targetMatch[1]) : null;
     const stopLoss = stopLossMatch ? parseFloat(stopLossMatch[1]) : null;
-    const momentum = momentumMatch ? momentumMatch[1].toUpperCase() : 'UNKNOWN';
-    const volumeAcceleration = volumeAccelMatch ? volumeAccelMatch[1].toUpperCase() : 'UNKNOWN';
-    const institutionalBias = institutionalMatch ? institutionalMatch[1].toUpperCase() : 'UNKNOWN';
-    const timeframe = timeframeMatch ? timeframeMatch[1].trim() : 'Unknown';
-    const reasoning = reasoningMatch ? reasoningMatch[1].trim() : 'Full LLM directional analysis completed';
+    const reasoning = reasoningMatch ? reasoningMatch[1].trim() : 'Full LLM analysis completed';
     
-    console.log('\n🎯 LLM DIRECTIONAL PREDICTION:');
-    console.log(`   Signal: ${enhancedSignal}`);
-    console.log(`   Confidence: ${enhancedConfidence}%`);
-    console.log(`   🔮 Direction Prediction: ${prediction}`);
-    console.log(`   🔮 Prediction Confidence: ${predictionConfidence}%`);
-    console.log(`   📈 Momentum: ${momentum}`);
-    console.log(`   📊 Volume Trend: ${volumeAcceleration}`);
-    console.log(`   🏛️ Institutional Bias: ${institutionalBias}`);
-    console.log(`   ⏱️ Timeframe: ${timeframe}`);
+    console.log('\n🎯 LLM ANALYSIS RESULT:');
+    console.log(`   Signal: ${signal}`);
+    console.log(`   Confidence: ${confidence}%`);
     console.log(`   Entry Price: ₹${entryPrice}`);
     if (targetPrice) console.log(`   Target Price: ₹${targetPrice}`);
     if (stopLoss) console.log(`   Stop Loss: ₹${stopLoss}`);
@@ -457,14 +350,12 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
     console.log(`   Volume Spike: ${volumeMatch ? volumeMatch[1] : 'Unknown'}`);
     console.log(`   Stacked Imbalances: ${imbalanceMatch ? imbalanceMatch[1] : 'Unknown'}`);
     console.log(`   Pattern Type: ${patternMatch ? patternMatch[1].trim() : 'Unknown'}`);
-    console.log(`   Prediction Logic: ${reasoning}`);
+    console.log(`   Reasoning: ${reasoning.substring(0, 150)}...`);
     
     return {
       symbol,
-      signal: enhancedSignal,
-      confidence: enhancedConfidence,
-      prediction,
-      predictionConfidence,
+      signal,
+      confidence,
       entryPrice,
       targetPrice,
       stopLoss,
@@ -472,15 +363,11 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
       fullAnalysis: llmResponse,
       currentPrice,
       candlesAnalyzed: post915Candles.length,
-      method: 'FULL_LLM_PREDICTION',
+      method: 'FULL_LLM',
       breakoutDetected: breakoutMatch ? breakoutMatch[1] === 'YES' : false,
       volumeSpike: volumeMatch ? volumeMatch[1] === 'YES' : false,
       stackedImbalances: imbalanceMatch ? imbalanceMatch[1] === 'YES' : false,
-      patternType: patternMatch ? patternMatch[1].trim() : 'Unknown',
-      momentum,
-      volumeAcceleration,
-      institutionalBias,
-      timeframe
+      patternType: patternMatch ? patternMatch[1].trim() : 'Unknown'
     };
 
   } catch (error) {
@@ -492,9 +379,7 @@ Remember: Your PRIMARY job is to predict the IMMEDIATE NEXT DIRECTION. Be extrem
       reasoning: error.message,
       currentPrice,
       candlesAnalyzed: post915Candles.length,
-      method: 'FULL_LLM_PREDICTION',
-      prediction: 'ERROR',
-      predictionConfidence: 0
+      method: 'FULL_LLM'
     };
   }
 }
@@ -540,47 +425,37 @@ async function main() {
     
     // Summary
     console.log('\n' + '═'.repeat(80));
-    console.log('🤖 FULL LLM DIRECTIONAL PREDICTION SUMMARY');
+    console.log('🤖 FULL LLM ANALYSIS SUMMARY');
     console.log('═'.repeat(80));
 
     const buySignals = results.filter(r => r.signal === 'BUY').length;
     const sellSignals = results.filter(r => r.signal === 'SELL').length;
     const noGoodSignals = results.filter(r => r.signal === 'NO_GOOD').length;
-    const upPredictions = results.filter(r => r.prediction === 'UP').length;
-    const downPredictions = results.filter(r => r.prediction === 'DOWN').length;
 
     console.log(`🟢 BUY Signals: ${buySignals}`);
     console.log(`🔴 SELL Signals: ${sellSignals}`);
     console.log(`⚫ NO GOOD: ${noGoodSignals}`);
-    console.log(`📈 UP Predictions: ${upPredictions}`);
-    console.log(`📉 DOWN Predictions: ${downPredictions}`);
 
     if (buySignals > 0) {
-      console.log('\n🟢 LLM BUY RECOMMENDATIONS (with Direction Prediction):');
+      console.log('\n🟢 LLM BUY RECOMMENDATIONS:');
       results.filter(r => r.signal === 'BUY').forEach(r => {
         console.log(`   ${r.symbol} - ${r.confidence}% confidence`);
-        console.log(`      🔮 Prediction: ${r.prediction} (${r.predictionConfidence}% confidence)`);
-        console.log(`      📈 Momentum: ${r.momentum} | Volume: ${r.volumeAcceleration} | Bias: ${r.institutionalBias}`);
-        console.log(`      💰 Entry: ₹${r.entryPrice} | Target: ₹${r.targetPrice || 'TBD'} | Stop: ₹${r.stopLoss || 'TBD'}`);
-        console.log(`      ⏱️ Timeframe: ${r.timeframe}`);
-        console.log(`      ✅ Pattern: ${r.patternType} | Breakout: ${r.breakoutDetected ? '✅' : '❌'} | Volume: ${r.volumeSpike ? '✅' : '❌'} | Imbalances: ${r.stackedImbalances ? '✅' : '❌'}`);
+        console.log(`      Entry: ₹${r.entryPrice} | Target: ₹${r.targetPrice || 'TBD'} | Stop: ₹${r.stopLoss || 'TBD'}`);
+        console.log(`      Pattern: ${r.patternType} | Breakout: ${r.breakoutDetected ? '✅' : '❌'} | Volume: ${r.volumeSpike ? '✅' : '❌'} | Imbalances: ${r.stackedImbalances ? '✅' : '❌'}`);
       });
     }
 
     if (sellSignals > 0) {
-      console.log('\n🔴 LLM SELL RECOMMENDATIONS (with Direction Prediction):');
+      console.log('\n🔴 LLM SELL RECOMMENDATIONS:');
       results.filter(r => r.signal === 'SELL').forEach(r => {
         console.log(`   ${r.symbol} - ${r.confidence}% confidence`);
-        console.log(`      🔮 Prediction: ${r.prediction} (${r.predictionConfidence}% confidence)`);
-        console.log(`      📉 Momentum: ${r.momentum} | Volume: ${r.volumeAcceleration} | Bias: ${r.institutionalBias}`);
-        console.log(`      💰 Entry: ₹${r.entryPrice} | Target: ₹${r.targetPrice || 'TBD'} | Stop: ₹${r.stopLoss || 'TBD'}`);
-        console.log(`      ⏱️ Timeframe: ${r.timeframe}`);
-        console.log(`      ✅ Pattern: ${r.patternType} | Breakout: ${r.breakoutDetected ? '✅' : '❌'} | Volume: ${r.volumeSpike ? '✅' : '❌'} | Imbalances: ${r.stackedImbalances ? '✅' : '❌'}`);
+        console.log(`      Entry: ₹${r.entryPrice} | Target: ₹${r.targetPrice || 'TBD'} | Stop: ₹${r.stopLoss || 'TBD'}`);
+        console.log(`      Pattern: ${r.patternType} | Breakout: ${r.breakoutDetected ? '✅' : '❌'} | Volume: ${r.volumeSpike ? '✅' : '❌'} | Imbalances: ${r.stackedImbalances ? '✅' : '❌'}`);
       });
     }
 
-    console.log('\n✅ Full LLM Directional Prediction Analysis Complete!');
-    console.log('🔮 Based on AI directional prediction analysis with tick-by-tick momentum assessment');
+    console.log('\n✅ Full LLM Analysis Complete!');
+    console.log('🤖 Based on AI analysis of historical context, patterns, and volume footprints');
     
   } catch (error) {
     console.error('❌ Error:', error.message);
